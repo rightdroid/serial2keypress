@@ -21,8 +21,8 @@ const conf = {
         {
             x : 0,
             y : 0,
-            w : 1000,
-            h : 700,
+            w : 240,
+            h : 260,
         },
         secondary : 
         {

@@ -6,6 +6,44 @@
     <title>serial2keybind</title>
 </head>
 <body>
-    <h1>serial2keybind</h1>
+    <div id="sentKeysWrapper">
+        <div id="sentKeysHeader">Sent KeyPresses</div>
+        <div id="sentKeys">
+            <div class="sentKey">w</div>
+            <div class="sentKey">w</div>
+            <div class="sentKey">w</div>
+        </div>
+    </div>
 </body>
 </html>
+
+<style>
+    
+    html, body
+    {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    body
+    {
+        background-color: antiquewhite;
+    }
+    #sentKeysWrapper
+    {
+        max-height: 190px;
+        overflow-y: scroll;
+    }
+    #sentKeysHeader
+    {
+        
+    }
+    .sentKey
+    {
+        display: block;
+        background-color: wheat;
+        border: 1px solid darkgreen;
+        padding: 10px;
+        margin: 5px;
+    }
+</style>

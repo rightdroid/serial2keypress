@@ -4,7 +4,7 @@ const {app, BrowserWindow, protocol, ipcMain} = require('electron');
 const log = require('electron-log');
 const path = require('path');
 const h = require('./modules/helpers.js');
-const serialport2Keybind = require('./modules/serialport2Keybind.js');
+const Serialport2Keybind = require('./modules/serialport2Keybind.js');
 const {conf} = require('./config.js');
 const {KioskWindow} = require('./classes.js');
 const {download} = require('electron-dl');
@@ -15,6 +15,7 @@ const { session } = require('electron');
 const appData = {
     locale : 'et',
     idleTimeout : null,
+    s2Keybind : null
 }
 
 let windows = null;
@@ -164,7 +165,19 @@ app.on('ready', function(){
     h.getWin('main').instance.webContents.on('new-window', function(event, urlToOpen) {
         event.defaultPrevented = true;
         h.getWin('main').instance.loadURL(urlToOpen);
-      });
+    });
+    
+    
+    const handleKeypress = key => {
+        const msg = {
+            action : 'keypress',
+            actionData : key
+        }
+        console.log(`testing: ${msg}`);
+        h.getWin('main').instance.webContents.send('keypress', msg);
+    }
+
+    appData.s2Keybind = new Serialport2Keybind(handleKeypress);
     
     // h.getWin('daemon').instance.hide();
 });
@@ -226,7 +239,6 @@ ipcMain.on('locale', (event, payload) => {
     }
 });
 
-
 ipcMain.on('online-status-changed', (event, status) => {
     log.info('online-status-changed triggered', status);
 });
@@ -240,5 +252,9 @@ ipcMain.on('download-media', async (event, url) => {
                 if(percent == 1) log.info(`done downloading: ${url}`);
             },
         });
+});
+
+ipcMain.on('keypress', (event, data) => {
+    log.info('keypress triggered', data);
 });
 //#endregion

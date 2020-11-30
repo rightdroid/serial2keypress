@@ -1,9 +1,11 @@
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
+const {webContents} = require('electron');
+
 
 class Serialport2Keybind
 {
-    constructor()
+    constructor(keybindCallback)
     {
         this.socket = null,
         this.serialport = null,
@@ -20,6 +22,7 @@ class Serialport2Keybind
         }
         this.comName = null;
         this.parser = null;
+        this.callbackFunc = keybindCallback;
         
         this.scanPorts();
     }
@@ -42,6 +45,13 @@ class Serialport2Keybind
         // await keyboard.pressKey(Key[key]);
         // await keyboard.releaseKey(Key[key]);
         console.log(`Sending key ${key}`);
+        this.callbackFunc(key);
+        // webContents.send('keypress', 
+        //     {
+        //         action : 'keypress',
+        //         actionData : key
+        //     }
+        // );
     }
 
     setupDataParsing = () => {
@@ -121,4 +131,4 @@ class Serialport2Keybind
 }
 
 // module.exports.Serialport2Keybind = Serialport2Keybind;
-module.exports = new Serialport2Keybind();
+module.exports = Serialport2Keybind;

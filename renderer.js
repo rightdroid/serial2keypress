@@ -6,6 +6,12 @@ const { ipcRenderer, remote } = require('electron');
 window.mousetrap = require('mousetrap');
 window.ipc = ipcRenderer; // for use in html where node integration is disabled
 
+const appData = 
+{
+    keys : [],
+    logLimit : 50,
+}
+
 window.checkFileExists = remote.require('./main').checkFileExists;
 window.exitApp = remote.require('./main').exitApp;
 
@@ -43,3 +49,37 @@ window.mousetrap.bind(['f3'], function() {
     }
     return false;
 });
+
+renderKeys = () =>{
+    const keysNode = document.getElementById('sentKeys');
+    if(keysNode != null)
+    {
+        keysNode.innerHTML = '';
+        for(i = 0, j = appData.keys.length; i < j; i++)
+        {
+            // create keynode
+            var keyNode = document.createElement('code');
+            keyNode.className = 'sentKey';
+            keyNode.innerHTML = `${appData.keys[i].data} (${appData.keys[i].timestamp})`;
+            
+            keysNode.prepend(keyNode);
+        }
+    }
+}
+
+addKey = key => {
+    const keyObj = {
+        data: key,
+        timestamp : Date.now(),
+    }
+    appData.keys.push(keyObj);
+    if(appData.keys.length > appData.logLimit)
+        appData.keys.shift();
+}
+
+ipcRenderer.on('keypress',  (event, msg) => {   
+    addKey(msg.actionData);
+    renderKeys();
+}
+
+);
