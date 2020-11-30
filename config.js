@@ -9,9 +9,9 @@ const conf = {
         // these are overridden by individual browserWindow settings
         getScreenDimensions : true, // finds primary and secondary display values via electron
         preventNewTabs : true, // prevent opening links in new tabs
-        openDevTools : false,
+        openDevTools : true,
         kiosk : false,
-        fullscreen : true,
+        fullscreen : false,
         resizable : true,
         frame : true,
         focusable : true,
@@ -21,7 +21,7 @@ const conf = {
         {
             x : 0,
             y : 0,
-            w : 1200,
+            w : 1000,
             h : 700,
         },
         secondary : 
@@ -31,7 +31,7 @@ const conf = {
             w : 0,
             h : 0,
         },
-        overlay : 
+        daemon : 
         {
             x : 40,
             y : 960,

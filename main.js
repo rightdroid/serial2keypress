@@ -21,7 +21,6 @@ protocol.registerSchemesAsPrivileged([
 
 const appData = {
     locale : 'et',
-    mainUrl : `http://expo.tootukassa.internal/wordpress/${packageJson.codeName}`,
     idleTimeout : null,
 }
 
@@ -35,7 +34,7 @@ const defineWindows = () =>
     return [
         new KioskWindow({ 
             id: 'main', 
-            url: (confJson.has('url') ? confJson.get('url') : appData.mainUrl), 
+            url: `file://${__dirname}/html/index.html`, 
             x: conf.display.primary.x, y: conf.display.primary.y, 
             w: conf.display.primary.w, h: conf.display.primary.h, 
             show: true, 
@@ -51,9 +50,10 @@ const defineWindows = () =>
             openDevTools : null,
          }),
         new KioskWindow({ 
-            id: 'overlay', url: `file://${__dirname}/html/overlay.html`, 
-            x: conf.display.overlay.x, y: conf.display.overlay.y, 
-            w: conf.display.overlay.w, h: conf.display.overlay.h, 
+            id: 'daemon',
+            url: `file://${__dirname}/html/daemon.html`, 
+            x: conf.display.daemon.x, y: conf.display.daemon.y, 
+            w: conf.display.daemon.w, h: conf.display.daemon.h, 
             show: true, 
             nodeIntegration: true,
             // general display settings. If not null, will override config.js settings.
@@ -73,9 +73,9 @@ const createAllWindows = (w) => {
 };
 
 const createWindow = win => {
-    // special parent case for overlay window
+    // special parent case for daemon window
     let parent = null;
-    if (win.id == 'overlay') parent = h.getWin('main').instance;
+    if (win.id == 'daemon') parent = h.getWin('main').instance;
     
     // Create the browser window.
     win.instance = new BrowserWindow({
@@ -96,6 +96,7 @@ const createWindow = win => {
         transparent: win.transparent != null ? win.transparent : conf.display.transparent,
         webPreferences: {
             nodeIntegration: win.nodeIntegration,
+            enableRemoteModule: true,
             preload: path.resolve(__dirname, 'renderer.js'),
             webSecurity: false
         }
@@ -127,14 +128,6 @@ const createWindow = win => {
         win.instance.on('page-title-updated', function(e) {
             e.preventDefault()
         });
-        
-        // prevent _blank links from opening in new tab
-        // win.instance.webContents.on('new-window', function(e, url) {
-        //     e.preventDefault();
-        //     e.defaultPrevented = true;
-        //     // require('electron').shell.openExternal(url);
-        //     win.instance.loadURL(url);
-        //   });
     }
 }
 
@@ -176,16 +169,11 @@ app.on('ready', function(){
       }
     );
     
-    // check json config file, if no url key exists, set default
-    if(!confJson.has('url') || confJson.get('url') == '') confJson.set('url', appData.mainUrl);
-    
     // browser window creation
     if(conf.display.getScreenDimensions) h.getScreenDimensions(conf.display, electron.screen);
     windows = defineWindows();
     h.setWindows(windows);
-    // sync overlay window position with parent
-    h.getWin('overlay').x = conf.display.primary.x + conf.display.overlay.x;
-    h.getWin('overlay').y = conf.display.primary.h - 75;
+    
     createAllWindows(windows);
       
     h.getWin('main').instance.webContents.on('new-window', function(event, urlToOpen) {
@@ -193,7 +181,7 @@ app.on('ready', function(){
         h.getWin('main').instance.loadURL(urlToOpen);
       });
     
-    h.getWin('overlay').instance.hide();
+    // h.getWin('daemon').instance.hide();
 });
 
 // Quit when all windows are closed.
@@ -211,7 +199,7 @@ const returnHome = origin => {
     const browserWin = h.getWin('main').instance;
     browserWin.loadURL(`${url}?locale=${appData.locale}`);
     browserWin.webContents.once('did-finish-load', () =>{
-        h.getWin('overlay').instance.hide();
+        h.getWin('daemon').instance.hide();
         
         // clear storageData & cookies
         session.defaultSession.clearStorageData([], (data) => {})
@@ -241,7 +229,7 @@ ipcMain.on('nav', (event, payload) => {
     
     if(payload.action == 'leaveHome')
     {
-        h.getWin('overlay').instance.show();
+        h.getWin('daemon').instance.show();
     }
 });
 

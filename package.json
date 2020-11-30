@@ -2,6 +2,9 @@
     "name": "serialport2keybind",
     "version": "1.0.0",
     "description": "Reads serialport and simulates keypresses",
+    "repository": {
+        "url": "https://bitbucket.org/spinaldev/serialport2keybind/"
+    },
     "main": "main.js",
     "codeName": "s2keybind",
     "scripts": {
@@ -39,11 +42,10 @@
         "serialport"
     ],
     "author": "Spinal Developments",
-    "license": "copyrighted",
+    "license": "UNLICENSED",
     "devDependencies": {
         "electron-builder": "^22.1.0",
         "electron": "^11.0.3",
-        "electron-log": "^3.0.8",
         "serialport": "^8.0.6"
     },
     "dependencies": {
