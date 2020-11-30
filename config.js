@@ -7,7 +7,7 @@ const conf = {
     {
         mainWinTitle : 'Karjäärikeskuse kodu',
         // these are overridden by individual browserWindow settings
-        getScreenDimensions : true, // finds primary and secondary display values via electron
+        getScreenDimensions : false, // finds primary and secondary display values via electron
         preventNewTabs : true, // prevent opening links in new tabs
         openDevTools : true,
         kiosk : false,

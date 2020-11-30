@@ -3,21 +3,14 @@ const packageJson = require('./package.json');
 const {app, BrowserWindow, protocol, ipcMain} = require('electron');
 const log = require('electron-log');
 const path = require('path');
-const h = require('./helpers.js');
+const h = require('./modules/helpers.js');
+const serialport2Keybind = require('./modules/serialport2Keybind.js');
 const {conf} = require('./config.js');
 const {KioskWindow} = require('./classes.js');
 const {download} = require('electron-dl');
 const fs = require('fs');
 const confJson = require('electron-json-config');
 const { session } = require('electron');
-
-
-// movie protocol for handling local media files.
-// If media exists locally, then it is asked from browser by media protocol,
-// which returns path to local media folder, usually at %appData% roaming/[appName]
-protocol.registerSchemesAsPrivileged([
-    { scheme: 'movie', privileges: { standard: true, secure: true } }
-]);
 
 const appData = {
     locale : 'et',
@@ -49,22 +42,22 @@ const defineWindows = () =>
             transparent : null,
             openDevTools : null,
          }),
-        new KioskWindow({ 
-            id: 'daemon',
-            url: `file://${__dirname}/html/daemon.html`, 
-            x: conf.display.daemon.x, y: conf.display.daemon.y, 
-            w: conf.display.daemon.w, h: conf.display.daemon.h, 
-            show: true, 
-            nodeIntegration: true,
-            // general display settings. If not null, will override config.js settings.
-            fullscreen: false,
-            kiosk: false,
-            focusable : false,
-            resizable : false,
-            frame : false,
-            transparent : true,
-            openDevTools : false,
-         }),
+        // new KioskWindow({ 
+        //     id: 'daemon',
+        //     url: `file://${__dirname}/html/daemon.html`, 
+        //     x: conf.display.daemon.x, y: conf.display.daemon.y, 
+        //     w: conf.display.daemon.w, h: conf.display.daemon.h, 
+        //     show: true, 
+        //     nodeIntegration: true,
+        //     // general display settings. If not null, will override config.js settings.
+        //     fullscreen: false,
+        //     kiosk: false,
+        //     focusable : false,
+        //     resizable : false,
+        //     frame : false,
+        //     transparent : true,
+        //     openDevTools : false,
+        //  }),
     ];
 }
 
@@ -160,14 +153,6 @@ exports.checkFileExists = fileName => {
 
 app.on('ready', function(){
     log.info('App starting...');
-    protocol.registerFileProtocol('movie', (request, callback) => {
-        let url = request.url.split('://');
-        url = url[1].slice(0, -1); 
-        callback({path : `${app.getPath('userData')}/media/${url}`})
-      }, (error) => {
-        if (error) console.error('Failed to register protocol')
-      }
-    );
     
     // browser window creation
     if(conf.display.getScreenDimensions) h.getScreenDimensions(conf.display, electron.screen);
