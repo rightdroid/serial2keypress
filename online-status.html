@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+    // Sends online-status-changed to main process,
+    // if need to implement network dependent functionality
+    const updateOnlineStatus = () => {
+        let s = navigator.onLine ? 'online' : 'offline';
+        window.ipc.send('online-status-changed', s);
+    }
+
+    window.addEventListener('online',  updateOnlineStatus);
+    window.addEventListener('offline',  updateOnlineStatus);
+
+    updateOnlineStatus();
+</script>
+</body>
+</html>

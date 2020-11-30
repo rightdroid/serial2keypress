@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home Button</title>
+</head>
+<body>
+    <div id="mainWrapper">
+        <button id="backHome" class="">
+            <img src="../img/backHome.png" alt="Tagasi avavaatesse">
+        </button>
+    </div>
+
+    <script>
+        // Listen for messages
+        const {ipcRenderer} = require('electron');
+        document.getElementById('backHome').addEventListener('click', () => {
+            ipcRenderer.send('nav', {action : 'backHome', actionData : {origin : 'overlay'}});
+        });
+    </script>
+    <style>
+        body
+        {
+            color: rgb(200,200,200);
+            margin: 0;
+            padding: 0;
+            font-family: monospace;
+        }
+        
+        .hidden
+        {
+            display: none;
+            pointer-events: none;
+        }
+        
+        #mainWrapper
+        {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+        }
+        
+        #mainWrapper > div
+        {
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        #backHome
+        {
+            position: relative;
+            margin: 0 auto;
+            font-size: 35px;
+            background-color: #f79239;
+            padding: 8px;
+            border-radius: 10px;
+            opacity: 0.5;
+            height: 80px;
+            width: 80px;
+        }
+        
+        #backHome > img
+        {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</body>
+</html>
