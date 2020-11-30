@@ -1,16 +1,16 @@
 {
-    "name": "kkeskus-e09",
-    "version": "1.1.5",
-    "description": "Karjäärikeskus kiosk app",
+    "name": "serialport2keybind",
+    "version": "1.0.0",
+    "description": "Reads serialport and simulates keypresses",
     "main": "main.js",
-    "codeName": "e09",
+    "codeName": "s2keybind",
     "scripts": {
         "start": "electron .",
         "build": "electron-builder build"
     },
     "build": {
-        "appId": "kkeskus.spinaldev",
-        "productName": "Karjäärikeskus Kiosk",
+        "appId": "s2keybind.spinaldev",
+        "productName": "Serialport 2 Keybind",
         "asar": true,
         "directories": {
             "output": "dist"
@@ -19,7 +19,7 @@
             "publish": [
                 {
                     "provider": "generic",
-                    "url": "http://latest.spinaldev.com/kkeskus/e09/"
+                    "url": "http://latest.spinaldev.com/serialport2keybind/"
                 },
                 {
                     "provider": "github"
@@ -28,20 +28,23 @@
         },
         "nsis": {
             "oneClick": true,
-            "shortcutName": "Karjäärikeskus Kiosk",
-            "artifactName": "KKeskusKiosk-e09.Setup.${version}.${ext}"
+            "shortcutName": "Serialport 2 Keybind",
+            "artifactName": "S2keybind.Setup.${version}.${ext}"
         }
     },
     "keywords": [
         "electron",
-        "kiosk",
-        "spinaldev"
+        "spinaldev",
+        "keypress",
+        "serialport"
     ],
     "author": "Spinal Developments",
     "license": "copyrighted",
     "devDependencies": {
-        "electron": "^7.1.8",
-        "electron-builder": "^22.1.0"
+        "electron-builder": "^22.1.0",
+        "electron": "^11.0.3",
+        "electron-log": "^3.0.8",
+        "serialport": "^8.0.6"
     },
     "dependencies": {
         "electron-dl": "^1.14.0",
