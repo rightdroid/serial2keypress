@@ -42,16 +42,7 @@ class Serialport2Keybind
     }
 
     sendKey = async(key) => {
-        // await keyboard.pressKey(Key[key]);
-        // await keyboard.releaseKey(Key[key]);
-        console.log(`Sending key ${key}`);
         this.callbackFunc(key);
-        // webContents.send('keypress', 
-        //     {
-        //         action : 'keypress',
-        //         actionData : key
-        //     }
-        // );
     }
 
     setupDataParsing = () => {

@@ -9,7 +9,8 @@
     "codeName": "s2keybind",
     "scripts": {
         "start": "electron .",
-        "build": "electron-builder build"
+        "build": "electron-builder build",
+        "rebuild": "electron-rebuild"
     },
     "build": {
         "appId": "s2keybind.spinaldev",
@@ -49,11 +50,12 @@
         "electron-rebuild": "^2.3.2"
     },
     "dependencies": {
-        "serialport": "^8.0.6",
         "electron-dl": "^1.14.0",
         "electron-json-config": "^1.5.3",
         "electron-log": "^3.0.8",
         "electron-updater": "^4.2.0",
-        "mousetrap": "^1.6.5"
+        "mousetrap": "^1.6.5",
+        "sendkeys": "^1.1.1",
+        "serialport": "^8.0.6"
     }
 }

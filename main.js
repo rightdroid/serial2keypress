@@ -11,6 +11,9 @@ const {download} = require('electron-dl');
 const fs = require('fs');
 const confJson = require('electron-json-config');
 const { session } = require('electron');
+// const { keyboard, Key, mouse, left, right, up, down, screen } = require("@nut-tree/nut-js");npm i --save
+const sendkeys = require('sendkeys');
+
 
 const appData = {
     locale : 'et',
@@ -168,13 +171,18 @@ app.on('ready', function(){
     });
     
     
-    const handleKeypress = key => {
+    const handleKeypress = async (key)=> {
         const msg = {
             action : 'keypress',
             actionData : key
         }
         console.log(`testing: ${msg}`);
+        // send signal to renderer window
         h.getWin('main').instance.webContents.send('keypress', msg);
+        
+        // simulate keystroke
+        sendkeys(key).then(() => console.log('success'));
+
     }
 
     appData.s2Keybind = new Serialport2Keybind(handleKeypress);
@@ -252,9 +260,5 @@ ipcMain.on('download-media', async (event, url) => {
                 if(percent == 1) log.info(`done downloading: ${url}`);
             },
         });
-});
-
-ipcMain.on('keypress', (event, data) => {
-    log.info('keypress triggered', data);
 });
 //#endregion
