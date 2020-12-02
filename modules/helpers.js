@@ -39,7 +39,25 @@ class Helpers
     
     kbToMb = v => (v / Math.pow(10, 6)).toFixed(2);
     
+    
+    getTimestamp = () => {
+        const time  = new Date();
+        const msecs = time.getMilliseconds();
+        const secs = time.getSeconds();
+        const mins = time.getMinutes();
+        const hours = time.getHours();
+        
+        const h = hours <= 9 ? '0' + hours : hours;
+        const m = mins <= 9 ? '0' + mins : mins;
+        const s = secs <= 9 ? '0' + secs : secs;
+        const ms = msecs <= 9 ? '0' + msecs : msecs;
+        
+        const timestamp = `${h}:${m}:${s}.${ms}`;
+        return timestamp;
+    }
+    
 }
+
 
 
 // export default { getWinById, foo };

@@ -3,17 +3,29 @@ const conf = {
     {
         version : null, // dynamically fetched on app start
     },
+    serial : {
+        acceptedPortManufacturers : [
+            'wch.cn',
+            'arduino.cc',
+        ],
+        baudRate : 9600,
+    },
+    parsing : 
+    {
+        prefix : 'kb',
+        delimiter : ':'
+    },
     display : 
     {
-        mainWinTitle : 'Karjäärikeskuse kodu',
+        mainWinTitle : 'SerialPort 2 KeyBind',
         // these are overridden by individual browserWindow settings
         getScreenDimensions : false, // finds primary and secondary display values via electron
         preventNewTabs : true, // prevent opening links in new tabs
-        openDevTools : true,
+        openDevTools : false,
         kiosk : false,
         fullscreen : false,
         resizable : true,
-        frame : true,
+        frame : false,
         focusable : true,
         transparent : null,
         notiWinIgnoreMouseEvents : false,  // Ignore Mouse so that it cannot be closed by user input
@@ -21,8 +33,10 @@ const conf = {
         {
             x : 0,
             y : 0,
-            w : 240,
-            h : 260,
+            // w : 240,
+            w : 530,
+            // h : 360,
+            h : 420,
         },
         secondary : 
         {

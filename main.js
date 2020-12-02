@@ -4,13 +4,13 @@ const {app, BrowserWindow, protocol, ipcMain} = require('electron');
 const log = require('electron-log');
 const path = require('path');
 const h = require('./modules/helpers.js');
+const LogHandler = require('./modules/logHandler');
 const Serialport2Keybind = require('./modules/serialport2Keybind.js');
 const {conf} = require('./config.js');
 const {KioskWindow} = require('./classes.js');
 const {download} = require('electron-dl');
 const fs = require('fs');
 const confJson = require('electron-json-config');
-const { session } = require('electron');
 // const { keyboard, Key, mouse, left, right, up, down, screen } = require("@nut-tree/nut-js");npm i --save
 const sendkeys = require('sendkeys');
 
@@ -18,11 +18,14 @@ const sendkeys = require('sendkeys');
 const appData = {
     locale : 'et',
     idleTimeout : null,
-    s2Keybind : null
+    s2Keybind : null,
+    logHandler : null,
+    canPressKey : true,
 }
 
 let windows = null;
 conf.app.version = app.getVersion();
+
 
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 
@@ -79,6 +82,7 @@ const createWindow = win => {
         name : win.id,
         homeUrl : win.url,
         title : conf.display.mainWinTitle,
+        backgroundColor: '#fff',
         width: win.w,
         height: win.h,
         x: win.x,
@@ -136,19 +140,24 @@ exports.exitApp = () =>
     });
 }
 
-exports.checkFileExists = fileName => {
-    let result = false;
-    log.info(`checking if ${fileName} exists`);
-    if (fs.existsSync(`${app.getPath('userData')}/media/${fileName}`))
-    {
-        log.info(`${fileName} exists`);
-        result = true;
+exports.handleKeypress = key => {
+    if(appData.canPressKey == false) return;
+    appData.canPressKey = false;
+    const msg = {
+        action : 'keypress',
+        actionData : key,
+        timestamp : h.getTimestamp()
     }
-    else
+    // send signal to renderer window
+    h.getWin('main').instance.webContents.send('keypress', msg);
+    
+    // simulate keystroke
+    sendkeys(key).then(() => 
     {
-        log.info(`${fileName} does not exist`)
+        appData.logHandler.add('success', `Simulated key: ${key}`);
+        appData.canPressKey = true;
     }
-    return result;
+    );
 }
 
 //////////////////////////////////////////////////////////
@@ -157,6 +166,13 @@ exports.checkFileExists = fileName => {
 
 app.on('ready', function(){
     log.info('App starting...');
+    
+    // check json config file, if no serial conf exists, set default
+    if(!confJson.has('serial') || confJson.get('serial') == '')
+    {
+        confJson.set('serial', conf.serial);
+        confJson.set('parsing', conf.parsing);
+    }
     
     // browser window creation
     if(conf.display.getScreenDimensions) h.getScreenDimensions(conf.display, electron.screen);
@@ -169,23 +185,14 @@ app.on('ready', function(){
         event.defaultPrevented = true;
         h.getWin('main').instance.loadURL(urlToOpen);
     });
-    
-    
-    const handleKeypress = async (key)=> {
-        const msg = {
-            action : 'keypress',
-            actionData : key
-        }
-        console.log(`testing: ${msg}`);
-        // send signal to renderer window
-        h.getWin('main').instance.webContents.send('keypress', msg);
+
+    h.getWin('main').instance.webContents.once('did-finish-load', () => {
+        // pass helpers to loghandler so it can
+        // send ipc messages to renderer
+        appData.logHandler = new LogHandler(h, log);
         
-        // simulate keystroke
-        sendkeys(key).then(() => console.log('success'));
-
-    }
-
-    appData.s2Keybind = new Serialport2Keybind(handleKeypress);
+        appData.s2Keybind = new Serialport2Keybind(confJson, exports.handleKeypress, appData.logHandler);
+    })
     
     // h.getWin('daemon').instance.hide();
 });
@@ -196,69 +203,7 @@ app.on('window-all-closed', () => {
 });
 
 //#region ipc binds
-const returnHome = origin => {
-    // reset language to estonian when backhome if called by keybind
-    // eg sent from AHK script
-    if(origin == 'keybind') appData.locale = 'et';
-    
-    const url = h.getWin('main').url;
-    const browserWin = h.getWin('main').instance;
-    browserWin.loadURL(`${url}?locale=${appData.locale}`);
-    browserWin.webContents.once('did-finish-load', () =>{
-        h.getWin('daemon').instance.hide();
-        
-        // clear storageData & cookies
-        session.defaultSession.clearStorageData([], (data) => {})
-    })
-}
-
-ipcMain.on('nav', (event, payload) => {
-    if(payload.action == 'backHome')
-    {
-        // if video is playing, reschedule timeout after video end + 1 minute
-        if(payload.actionData.videoDuration != null && payload.actionData.isVideoPlaying)
-        {
-            const remainingS = payload.actionData.videoDuration - payload.actionData.videoCurrentTime;
-            const remainingMs = remainingS * 1000; // conversion to ms
-            const remaining = remainingMs + (1000 * 60); // add 1 minute after video ends
-            if (appData.idleTimeout != null) clearTimeout(appData.idleTimeout);
-            appData.idleTimeout = setTimeout(function(){
-                returnHome(payload.actionData.origin);
-                idleTimeout = null;
-            }, remaining);
-        }
-        else
-        {
-            returnHome(payload.actionData.origin);
-        }
-    }
-    
-    if(payload.action == 'leaveHome')
-    {
-        h.getWin('daemon').instance.show();
-    }
-});
-
-// sync locale change on page with appData locale
-ipcMain.on('locale', (event, payload) => {
-    if(payload.action == 'localeChange')
-    {
-        appData.locale = payload.data.locale;
-    }
-});
-
 ipcMain.on('online-status-changed', (event, status) => {
     log.info('online-status-changed triggered', status);
-});
-
-ipcMain.on('download-media', async (event, url) => {
-    const win = BrowserWindow.getFocusedWindow();
-    await download(win, url, 
-        {
-            directory : `${app.getPath('userData')}/media/`,
-            onProgress : (percent) => {
-                if(percent == 1) log.info(`done downloading: ${url}`);
-            },
-        });
 });
 //#endregion
