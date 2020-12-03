@@ -21,11 +21,12 @@ const appData = {
     s2Keybind : null,
     logHandler : null,
     canPressKey : true,
+    suspended : false,
+    currentStatus : '',
 }
 
 let windows = null;
 conf.app.version = app.getVersion();
-
 
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 
@@ -34,7 +35,7 @@ const defineWindows = () =>
     return [
         new KioskWindow({ 
             id: 'main', 
-            url: `file://${__dirname}/html/index.html`, 
+            url: `file://${__dirname}/static/index.html`, 
             x: conf.display.primary.x, y: conf.display.primary.y, 
             w: conf.display.primary.w, h: conf.display.primary.h, 
             show: true, 
@@ -51,7 +52,7 @@ const defineWindows = () =>
          }),
         // new KioskWindow({ 
         //     id: 'daemon',
-        //     url: `file://${__dirname}/html/daemon.html`, 
+        //     url: `file://${__dirname}/static/daemon.html`, 
         //     x: conf.display.daemon.x, y: conf.display.daemon.y, 
         //     w: conf.display.daemon.w, h: conf.display.daemon.h, 
         //     show: true, 
@@ -141,7 +142,7 @@ exports.exitApp = () =>
 }
 
 exports.handleKeypress = key => {
-    if(appData.canPressKey == false) return;
+    if(appData.canPressKey == false || appData.isSuspended == true) return;
     appData.canPressKey = false;
     const msg = {
         action : 'keypress',
@@ -154,10 +155,14 @@ exports.handleKeypress = key => {
     // simulate keystroke
     sendkeys(key).then(() => 
     {
-        appData.logHandler.add('success', `Simulated key: ${key}`);
+        appData.logHandler.add({type : 'success', data : `Simulated key: ${key}`});
         appData.canPressKey = true;
-    }
-    );
+    });
+}
+
+exports.toggleSuspend = () => {
+    appData.isSuspended = !appData.isSuspended;
+    return appData.isSuspended;
 }
 
 //////////////////////////////////////////////////////////
@@ -180,11 +185,6 @@ app.on('ready', function(){
     h.setWindows(windows);
     
     createAllWindows(windows);
-      
-    h.getWin('main').instance.webContents.on('new-window', function(event, urlToOpen) {
-        event.defaultPrevented = true;
-        h.getWin('main').instance.loadURL(urlToOpen);
-    });
 
     h.getWin('main').instance.webContents.once('did-finish-load', () => {
         // pass helpers to loghandler so it can

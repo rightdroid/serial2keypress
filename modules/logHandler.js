@@ -6,16 +6,19 @@ class LogHandler
         this.electronLog = electronLog;
     }
     
-    add = (type, message, timestamp) => {
+    add = ({type, data, timestamp, extraData}) => {
         const log = {
             type : type,
-            data : message,
+            code : null,
+            data : data,
+            extraData : extraData || null,
             timestamp : timestamp == null ? this.h.getTimestamp() : timestamp 
         }
         this.logs.push(log);
+        console.log(log);
         this.sendSignal();
         
-        if(this.electronLog[type] != null) this.electronLog[type](message);
+        if(this.electronLog[type] != null) this.electronLog[type](data);
     }
     
     remove = () => {
@@ -27,11 +30,10 @@ class LogHandler
     }
     
     sendSignal = () => {
-        // const log = this.getLast();
         // send all logs
         const msg = {
             action : 'log',
-            actionData : this.logs
+            actionData : this.logs,
         }
         this.h.getWin('main').instance.webContents.send('log', msg);
     }

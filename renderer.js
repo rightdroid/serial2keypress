@@ -25,50 +25,45 @@ window.onbeforeunload = (event) => {
     win.removeAllListeners();
 }
 
-window.checkFileExists = remote.require('./main').checkFileExists;
-window.exitApp = remote.require('./main').exitApp;
-window.handleKeypress = remote.require('./main').handleKeypress;
+const {exitApp, handleKeypress, toggleSuspend} = remote.require('./main');
 
 window.mousetrap.bind(['escape'], function() {
     const wName = remote.BrowserWindow.getFocusedWindow().webContents.browserWindowOptions.name;
-    if(wName == 'main') window.exitApp();
+    if(wName == 'main') exitApp();
     return false;
 });
 
 window.mousetrap.bind(['v'], function() {
     const wName = remote.BrowserWindow.getFocusedWindow().webContents.browserWindowOptions.name;
-    if(wName == 'main') window.handleKeypress('V');
+    if(wName == 'main') 
+    {
+        handleKeypress('V{enter}');
+    }
     return false;
 });
 
 window.mousetrap.bind(['f3'], function() {
-    const wName = remote.BrowserWindow.getFocusedWindow().webContents.browserWindowOptions.name;
-    const currentUrl = new URL(remote.BrowserWindow.getFocusedWindow().webContents.getURL());
-    const homeUrl = new URL(remote.BrowserWindow.getFocusedWindow().webContents.browserWindowOptions.homeUrl);
-    if(wName == 'main')
-    {
-        let actionData = {origin: 'keybind'};
-        
-        // set actionData if we are on homepage. 
-        // If appData exists and hosts match, we should be on homepage
-        if(typeof(appData) !== 'undefined' && currentUrl.host == homeUrl.host)
-        {
-            actionData = {
-                videoDuration : appData.currentVideo != null ? parseFloat(appData.currentVideo.duration) : null,
-                videoCurrentTime : appData.currentVideo != null ? parseFloat(appData.currentVideo.currentTime) : null,
-                isVideoPlaying : appData.isVideoPlaying,
-                origin: 'keybind',
-            }
-        }
-        ipcRenderer.send('nav', 
-            {
-                action : 'backHome',
-                actionData : actionData
-            }
-        );
-    }
+    handleSuspend();
     return false;
 });
+
+const handleSuspend = () => {
+    isSuspended = toggleSuspend();
+    const statusNode = document.getElementById('suspendStatusIndicator');
+    const buttonNode = document.getElementById('toggleSuspend');
+    if(isSuspended)
+    {
+        statusNode.classList.add('suspended');
+        statusNode.title = 'Currently suspended'
+        buttonNode.innerHTML = 'keys suspended';
+    }
+    else
+    {   
+        statusNode.classList.remove('suspended');
+        statusNode.title = 'Currently active'
+        buttonNode.innerHTML = 'keys active';
+    }
+}
 
 const renderKeys = () =>{
     const keysNode = document.getElementById('sentKeys');
@@ -130,6 +125,35 @@ const renderLog = () => {
     }
 }
 
+const renderStatus = msg => {
+    const logsNode = document.getElementById('statusState');
+    const indicatorNode = document.getElementById('statusStateIndicator');
+    if(logsNode != null)
+    {
+        const data = msg.actionData;
+        const lastMsg = data[data.length-1]
+        // TODO implement proper error code system
+        // eg 1- Scanning, 10 - Error due to occupied port etc
+        if(lastMsg.type == 'info' && lastMsg.data.includes('Scanning'))
+        {
+            logsNode.innerHTML = 'Scanning ports';
+            indicatorNode.className = '';
+        }
+        if(lastMsg.type == 'error' && lastMsg.data.includes('Access Denied'))
+        {
+            logsNode.innerHTML = 'Error encountered';
+            indicatorNode.className = '';
+            indicatorNode.classList.add('statusError');
+        }
+        if(lastMsg.type == 'success' && lastMsg.data.includes('Choosing'))
+        {
+            logsNode.innerHTML = `Connected to ${lastMsg.extraData.comName}, baud rate ${lastMsg.extraData.baudrate}`;
+            indicatorNode.className = '';
+            indicatorNode.classList.add('statusSuccess');
+        }
+    }
+}
+
 // keep count of keys and start erasing them when
 // reached display limit
 const addKey = msg => {
@@ -157,7 +181,11 @@ const handleWindowControls = () => {
     });
 
     document.getElementById('close-button').addEventListener("click", e => {
-        win.close();
+        exitApp();
+    });
+    
+    document.getElementById('toggleSuspend').addEventListener("click", e => {
+        handleSuspend();
     });
 
     // Toggle maximise/restore buttons when maximisation/unmaximisation occurs
@@ -182,4 +210,5 @@ ipcRenderer.on('keypress',  (event, msg) => {
 ipcRenderer.on('log',  (event, msg) => {
     appData.logs = msg.actionData;
     renderLog();
+    renderStatus(msg);
 });

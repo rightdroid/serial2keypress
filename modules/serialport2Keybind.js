@@ -4,7 +4,7 @@ const Readline = require('@serialport/parser-readline');
 
 class Serialport2Keybind
 {
-    constructor(confJson, keybindCallback, logHandler, helpers)
+    constructor(confJson, sendKeyCB, logHandler, helpers, appData)
     {
         this.socket = null;
         this.serialport = null;
@@ -23,7 +23,7 @@ class Serialport2Keybind
         };
         this.comName = null;
         this.parser = null;
-        this.callbackFunc = keybindCallback;
+        this.sendKey = sendKeyCB;
         this.logHandler = logHandler;
         this.h = helpers;
         
@@ -36,7 +36,7 @@ class Serialport2Keybind
         
         if(msg.includes('Access denied'))
         {
-            this.logHandler.add('error', `Access Denied to COM Port. Aborting trying to connect.`);
+            this.logHandler.add({type : 'error', data : `Access Denied to COM Port. Aborting trying to connect.`});
             return; // dont retry when access is denied
         }
         
@@ -46,9 +46,9 @@ class Serialport2Keybind
     }
 
     setupDataParsing = () => {
-        this.logHandler.add('info', 
-        `Setting up data parsing<br/>Using prefix\
-         <code>${this.parsePrefix}</code>, delimiter <code>${this.parseDelimiter}</code>`);
+        this.logHandler.add({type : 'info', 
+        data : `Setting up data parsing<br/>Using prefix\
+        <code>${this.parsePrefix}</code>, delimiter <code>${this.parseDelimiter}</code>`});
         this.parser.on('data', data => {
             if(data.includes(this.parsePrefix))
             {
@@ -56,10 +56,10 @@ class Serialport2Keybind
                 const msg = data.split(this.parseDelimiter);
                 const key = msg[1].trim();
                 
-                this.callbackFunc(key);
+                this.sendKey(key);
             }
             else
-                this.logHandler.add('warning', `Serial data mismatch. Data: ${data}`);
+                this.logHandler.add({type : 'warning', data : `Serial data mismatch. Data: ${data}`});
         });
     }
 
@@ -78,12 +78,14 @@ class Serialport2Keybind
                 })
                 
                 portLog += '--------------------------';
-                this.logHandler.add('info', portLog);
+                this.logHandler.add({type : 'info', data : portLog});
                 
                 if(this.comName != null)
                 {
                     // console.log(`choosing port: ${this.comName}`);
-                    this.logHandler.add('success', `Choosing port: ${this.comName}. Using baud rate ${this.baudRate}.`);
+                    this.logHandler.add({type : 'success', 
+                        data : `Choosing port: ${this.comName}. Using baud rate ${this.baudRate}.`,
+                        extraData : {comName : this.comName, baudrate : this.baudRate}});
                     
                     this.serialport = new SerialPort(this.comName, {
                         baudRate: this.baudRate
@@ -92,13 +94,13 @@ class Serialport2Keybind
                     this.serialport.once('error', (err) => {
                         // got error, try to reconnect
                         this.retrySerialConnection('error', err.message);
-                        this.logHandler.add('error', `Retrying connection: ${err.message}`);
+                        this.logHandler.add({type : 'error', data : `Retrying connection: ${err.message}`});
                     })
                     
                     this.serialport.once('close', () => {
                         // port disconnected, try to reconnect
                         this.retrySerialConnection('closed', `${this.comName} connection closed`);
-                        this.logHandler.add('error', `Retrying connection: Port closed/disconnected.`);
+                        this.logHandler.add({type : 'error', data : `Retrying connection: Port closed/disconnected.`});
                     });
                     
                     this.parser = this.serialport.pipe(new Readline());
@@ -110,12 +112,12 @@ class Serialport2Keybind
                 {
                     // no comName match, try again;;
                     this.retrySerialConnection('noMatch', 'no COM Port name match, retrying...');
-                    this.logHandler.add('warning', `No COM Port name match, retrying...`);
+                    this.logHandler.add({type : 'warning', data : `No COM Port name match, retrying...`});
                     
                 }
             },
             err => {
-                this.logHandler.add('error', `Error listing ports: ${err}`);
+                this.logHandler.add({type : 'error', data : `Error listing ports: ${err}`});
             }
         )
     }

@@ -1,20 +1,20 @@
 {
-    "name": "serialport2keybind",
-    "version": "1.0.0",
+    "name": "serial2keypress",
+    "version": "1.0.1",
     "description": "Reads serialport and simulates keypresses",
     "repository": {
         "url": "https://bitbucket.org/spinaldev/serialport2keybind/"
     },
     "main": "main.js",
-    "codeName": "s2keybind",
+    "codeName": "s2keypress",
     "scripts": {
         "start": "electron .",
         "build": "electron-builder build",
         "rebuild": "electron-rebuild"
     },
     "build": {
-        "appId": "s2keybind.spinaldev",
-        "productName": "Serialport 2 Keybind",
+        "appId": "s2keypress.spinaldev",
+        "productName": "Serial2Keypress",
         "asar": true,
         "directories": {
             "output": "dist"
@@ -23,7 +23,7 @@
             "publish": [
                 {
                     "provider": "generic",
-                    "url": "http://latest.spinaldev.com/serialport2keybind/"
+                    "url": "http://latest.spinaldev.com/serial2keypress/"
                 },
                 {
                     "provider": "github"
@@ -32,8 +32,8 @@
         },
         "nsis": {
             "oneClick": true,
-            "shortcutName": "Serialport 2 Keybind",
-            "artifactName": "S2keybind.Setup.${version}.${ext}"
+            "shortcutName": "Serial2Keypress",
+            "artifactName": "S2keypress.Setup.${version}.${ext}"
         }
     },
     "keywords": [
