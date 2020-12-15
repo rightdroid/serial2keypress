@@ -1,10 +1,10 @@
 # A simple kiosk application for Windows OS
 
-Electron application that displays predefined url. Hardcoded url can be overridden in `config.json` located in its installation folder (by default in `AppData/Roaming` folder)
+Electron application that reads data from serialport and simualtes keypresses. For Windows 10.
 
 ## How To Use
 
-See [documentation](docs.spinaldev.com/kkeskus) 
+See [documentation](docs.spinaldev.com/serial2keypress)
 
 ## Development
 
