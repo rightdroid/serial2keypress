@@ -1,7 +1,6 @@
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 
-
 class Serialport2Keybind
 {
     constructor(confJson, sendKeyCB, logHandler, helpers, appData)
@@ -82,7 +81,6 @@ class Serialport2Keybind
                 
                 if(this.comName != null)
                 {
-                    // console.log(`choosing port: ${this.comName}`);
                     this.logHandler.add({type : 'success', 
                         data : `Choosing port: ${this.comName}. Using baud rate ${this.baudRate}.`,
                         extraData : {comName : this.comName, baudrate : this.baudRate}});
@@ -113,7 +111,6 @@ class Serialport2Keybind
                     // no comName match, try again;;
                     this.retrySerialConnection('noMatch', 'no COM Port name match, retrying...');
                     this.logHandler.add({type : 'warning', data : `No COM Port name match, retrying...`});
-                    
                 }
             },
             err => {
@@ -123,5 +120,4 @@ class Serialport2Keybind
     }
 }
 
-// module.exports.Serialport2Keybind = Serialport2Keybind;
 module.exports = Serialport2Keybind;

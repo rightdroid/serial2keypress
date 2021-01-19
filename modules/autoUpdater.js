@@ -1,4 +1,4 @@
-
+// autoUpdater currently not implemented
 autoUpdater.on('checking-for-update', () => {
     log.info('autoUpdater checking-for-update');
     notiObj.status = 'Checking for update';
