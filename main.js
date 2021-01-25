@@ -1,6 +1,5 @@
 const electron = require('electron');
-const packageJson = require('./package.json');
-const {app, BrowserWindow, protocol, ipcMain} = require('electron');
+const {app, BrowserWindow, ipcMain} = require('electron');
 const log = require('electron-log');
 const path = require('path');
 const h = require('./modules/Helpers.js');
@@ -8,10 +7,9 @@ const LogHandler = require('./modules/LogHandler');
 const Serialport2Keybind = require('./modules/Serialport2Keybind.js');
 const {conf} = require('./config.js');
 const KioskWindow = require('./modules/KioskWindow');
-const {download} = require('electron-dl');
-const fs = require('fs');
+// const {download} = require('electron-dl');
+// const fs = require('fs');
 const confJson = require('electron-json-config');
-// const { keyboard, Key, mouse, left, right, up, down, screen } = require("@nut-tree/nut-js");npm i --save
 const sendkeys = require('sendkeys');
 
 

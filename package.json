@@ -3,7 +3,7 @@
     "version": "1.0.1",
     "description": "Reads serialport and simulates keypresses",
     "repository": {
-        "url": "https://bitbucket.org/spinaldev/serialport2keybind/"
+        "url": "https://bitbucket.org/spinaldev/serial2keypress"
     },
     "main": "main.js",
     "codeName": "s2keypress",
@@ -13,7 +13,7 @@
         "rebuild": "electron-rebuild"
     },
     "build": {
-        "appId": "s2keypress.spinaldev",
+        "appId": "s2keypress.digilogika",
         "productName": "Serial2Keypress",
         "asar": true,
         "directories": {
@@ -38,11 +38,11 @@
     },
     "keywords": [
         "electron",
-        "spinaldev",
+        "digilogika",
         "keypress",
         "serialport"
     ],
-    "author": "Spinal Developments",
+    "author": "Toomas Jaska",
     "license": "UNLICENSED",
     "devDependencies": {
         "electron": "^11.0.3",
