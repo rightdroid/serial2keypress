@@ -22,7 +22,7 @@ class LogHandler
     }
     
     remove = () => {
-        
+        // not implemented
     }
     
     getLast = () => {
@@ -37,7 +37,6 @@ class LogHandler
         }
         this.h.getWin('main').instance.webContents.send('log', msg);
     }
-    
 }
 
 module.exports = LogHandler;
