@@ -4,7 +4,7 @@ Electron application that reads data from serialport and simulates keypresses. F
 
 ## How To Use
 
-See [documentation](docs.spinaldev.com/serial2keypress)
+See [documentation](http://docs.spinaldev.com/serial2keypress)
 
 ## Development
 
