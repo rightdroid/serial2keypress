@@ -39,7 +39,6 @@ class Helpers
     
     kbToMb = v => (v / Math.pow(10, 6)).toFixed(2);
     
-    
     getTimestamp = () => {
         const time  = new Date();
         const msecs = time.getMilliseconds();
@@ -58,7 +57,4 @@ class Helpers
     
 }
 
-
-
-// export default { getWinById, foo };
 module.exports = new Helpers();

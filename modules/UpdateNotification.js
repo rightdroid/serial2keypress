@@ -1,12 +1,3 @@
-
-class KioskWindow {
-    constructor({ ...args }) {
-        for (const [k, v] of Object.entries(args)) {
-            this[k] = v;
-        }
-    }
-}
-
 class UpdateNotification
 {
     defaults = {
@@ -35,8 +26,4 @@ class UpdateNotification
     }
 }
 
-module.exports = 
-{
-    KioskWindow : KioskWindow,
-    UpdateNotification : UpdateNotification,
-}
+module.exports = UpdateNotification;

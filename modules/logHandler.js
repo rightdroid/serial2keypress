@@ -40,6 +40,4 @@ class LogHandler
     
 }
 
-
-// export default { getWinById, foo };
 module.exports = LogHandler;

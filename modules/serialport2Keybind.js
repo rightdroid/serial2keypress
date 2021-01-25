@@ -1,7 +1,6 @@
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 
-
 class Serialport2Keybind
 {
     constructor(confJson, sendKeyCB, logHandler, helpers, appData)
@@ -123,5 +122,4 @@ class Serialport2Keybind
     }
 }
 
-// module.exports.Serialport2Keybind = Serialport2Keybind;
 module.exports = Serialport2Keybind;

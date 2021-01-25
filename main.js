@@ -3,11 +3,11 @@ const packageJson = require('./package.json');
 const {app, BrowserWindow, protocol, ipcMain} = require('electron');
 const log = require('electron-log');
 const path = require('path');
-const h = require('./modules/helpers.js');
-const LogHandler = require('./modules/logHandler');
-const Serialport2Keybind = require('./modules/serialport2Keybind.js');
+const h = require('./modules/Helpers.js');
+const LogHandler = require('./modules/LogHandler');
+const Serialport2Keybind = require('./modules/Serialport2Keybind.js');
 const {conf} = require('./config.js');
-const {KioskWindow} = require('./classes.js');
+const KioskWindow = require('./modules/KioskWindow');
 const {download} = require('electron-dl');
 const fs = require('fs');
 const confJson = require('electron-json-config');
@@ -41,31 +41,7 @@ const defineWindows = () =>
             show: true, 
             nodeIntegration: false,
             onbeforeunload: null,
-            // general display settings. If not null, will override config.js settings.
-            fullscreen: null,
-            kiosk: null,
-            focusable : null,
-            resizable : null,
-            frame : null,
-            transparent : null,
-            openDevTools : null,
          }),
-        // new KioskWindow({ 
-        //     id: 'daemon',
-        //     url: `file://${__dirname}/static/daemon.html`, 
-        //     x: conf.display.daemon.x, y: conf.display.daemon.y, 
-        //     w: conf.display.daemon.w, h: conf.display.daemon.h, 
-        //     show: true, 
-        //     nodeIntegration: true,
-        //     // general display settings. If not null, will override config.js settings.
-        //     fullscreen: false,
-        //     kiosk: false,
-        //     focusable : false,
-        //     resizable : false,
-        //     frame : false,
-        //     transparent : true,
-        //     openDevTools : false,
-        //  }),
     ];
 }
 
@@ -90,12 +66,12 @@ const createWindow = win => {
         y: win.y,
         parent: parent,
         show: win.show,
-        frame: win.frame != null ? win.frame : conf.display.frame,
-        focusable : win.focusable != null ? win.focusable : conf.display.focusable,
-        resizable: win.resizable != null ? win.resizable : conf.display.resizable,
-        fullscreen: win.fullscreen != null ? win.fullscreen : conf.display.fullscreen,
-        kiosk: win.kiosk != null ? win.kiosk : conf.display.kiosk,
-        transparent: win.transparent != null ? win.transparent : conf.display.transparent,
+        frame: false,
+        focusable : true,
+        resizable: true,
+        fullscreen: false,
+        kiosk: false,
+        // transparent: null,
         webPreferences: {
             nodeIntegration: win.nodeIntegration,
             enableRemoteModule: true,

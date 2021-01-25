@@ -18,16 +18,8 @@ const conf = {
     display : 
     {
         mainWinTitle : 'Serial 2 KeyPress',
-        // these are overridden by individual browserWindow settings
         getScreenDimensions : false, // finds primary and secondary display values via electron
-        preventNewTabs : true, // prevent opening links in new tabs
         openDevTools : false,
-        kiosk : false,
-        fullscreen : false,
-        resizable : true,
-        frame : false,
-        focusable : true,
-        transparent : null,
         notiWinIgnoreMouseEvents : false,  // Ignore Mouse so that it cannot be closed by user input
         primary : 
         {

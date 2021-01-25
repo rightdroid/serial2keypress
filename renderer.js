@@ -16,9 +16,8 @@ const appData =
 
 // When document has loaded, initialise
 document.onreadystatechange = (event) => {
-    if (document.readyState == "complete") {
+    if (document.readyState == "complete")
         handleWindowControls();
-    }
 };
 
 window.onbeforeunload = (event) => {
@@ -33,14 +32,15 @@ window.mousetrap.bind(['escape'], function() {
     return false;
 });
 
-window.mousetrap.bind(['v'], function() {
-    const wName = remote.BrowserWindow.getFocusedWindow().webContents.browserWindowOptions.name;
-    if(wName == 'main') 
-    {
-        handleKeypress('V{enter}');
-    }
-    return false;
-});
+// this is just for testing & debugging
+// window.mousetrap.bind(['v'], function() {
+//     const wName = remote.BrowserWindow.getFocusedWindow().webContents.browserWindowOptions.name;
+//     if(wName == 'main') 
+//     {
+//         handleKeypress('V{enter}');
+//     }
+//     return false;
+// });
 
 window.mousetrap.bind(['f3'], function() {
     handleSuspend();
